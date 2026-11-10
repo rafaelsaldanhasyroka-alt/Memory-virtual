@@ -19,7 +19,7 @@ int main()
 {
     int option;
     bool menu = true;
-    InitializeDisk();
+    paging::InitializeDisk();
     Disk[600] = 75;
     
     while (menu)
@@ -43,8 +43,8 @@ int main()
 
                 if (virtualAddress >= 0 && virtualAddress < VirtualMemorySize)
                 {
-                    int pageNumber = GetPageNumber(virtualAddress);
-                    int offset = GetPageOffset(virtualAddress);
+                    int pageNumber = paging::GetPageNumber(virtualAddress);
+                    int offset = paging::GetPageOffset(virtualAddress);
                     int frameNumber = PageTable[pageNumber];
 
                     std::cout << "Endereco virtual: 00000000V" << std::hex << virtualAddress << std::dec << '\n';
@@ -55,15 +55,15 @@ int main()
                     {
                         PageFaultCount++;
                         std:: cout << "Ocorreu Page fault procurando fora da ram.. \n";
-                        bool loaded = LoadPage(pageNumber);
+                        bool loaded = paging::LoadPage(pageNumber);
                         if (loaded == false)
                         {
-                            ReplaceOldestPage(pageNumber);
+                            paging::ReplaceOldestPage(pageNumber);
                         }
                         frameNumber = PageTable[pageNumber];
                     }
 
-                    int physicalAddress = GetPhysicalAddress(frameNumber, offset);
+                    int physicalAddress = paging::GetPhysicalAddress(frameNumber, offset);
 
                     std::cout << "frameNumber: " << frameNumber << '\n';
                     std::cout << "Endereco fisico: 00000000E" << std::hex << physicalAddress << std::dec << '\n';
@@ -83,9 +83,9 @@ int main()
                 std::cin >> physicalAddress;
                 if (physicalAddress >= 0 && physicalAddress < PhysicalMemorySize)
                 {
-                    int frameNumber = GetFrameNumber(physicalAddress);
-                    int offset = GetPageOffset(physicalAddress);
-                    int pageNumber = GetVirtualPage(frameNumber);
+                    int frameNumber = paging::GetFrameNumber(physicalAddress);
+                    int offset = paging::GetPageOffset(physicalAddress);
+                    int pageNumber = paging::GetVirtualPage(frameNumber);
 
                     std::cout << "Endereco fisico: 00000000E" << std::hex << physicalAddress << std::dec << '\n';
 
@@ -98,7 +98,7 @@ int main()
                     }
                     else
                     {
-                        int virtualAddress = GetVirtualAddress(pageNumber, offset);
+                        int virtualAddress = paging::GetVirtualAddress(pageNumber, offset);
 
                         std::cout << "pageNumber: " << pageNumber << '\n';
                         std::cout << "Endereco virtual: 00000000V" << std::hex << virtualAddress << std::dec << '\n';
@@ -115,22 +115,22 @@ int main()
             {
                 int virtualAddress = 600;
 
-                int pageNumber = GetPageNumber(virtualAddress);
-                int offset = GetPageOffset(virtualAddress);
+                int pageNumber = paging::GetPageNumber(virtualAddress);
+                int offset = paging::GetPageOffset(virtualAddress);
                 int frameNumber = PageTable[pageNumber];
 
                 if (frameNumber == -1)
                 {
                     std::cout << "Page Fault! Carregando pagina...\n";
 
-                    if (!LoadPage(pageNumber))
+                    if (!paging::LoadPage(pageNumber))
                     {
-                        ReplaceOldestPage(pageNumber);
+                        paging::ReplaceOldestPage(pageNumber);
                     }
                     frameNumber = PageTable[pageNumber];
                 }
 
-                int physicalAddress = GetPhysicalAddress(frameNumber, offset);
+                int physicalAddress = paging::GetPhysicalAddress(frameNumber, offset);
 
                 std::cout << "Endereco virtual: " << virtualAddress << '\n';
                 std::cout << "Endereco fisico: " << physicalAddress << '\n';
