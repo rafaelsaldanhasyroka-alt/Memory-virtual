@@ -13,7 +13,7 @@ int PageSize = 256;
 int PageTable[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 int FIFOQueue[4] = {-1, -1, -1, -1};
 int FIFOCount = 0;
-segment_simulation segments[16];
+segment_simulation segments[8];
 
 int main()
 {

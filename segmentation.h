@@ -7,6 +7,6 @@ struct segment_simulation {
     unsigned int start;
     unsigned int end;
 };
-extern segment_simulation segments[16];
+extern segment_simulation segments[8];
 
 #endif
