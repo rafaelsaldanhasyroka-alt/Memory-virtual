@@ -1,148 +1,19 @@
 
 #include <iostream>
+#include "segmentation.h"
+#include "paging.h"
 
+
+char Disk[2048] = {};
+char RAM[1024] = {};
+int PageFaultCount = 0;
 int VirtualMemorySize = 2048;
 int PhysicalMemorySize = 1024;
 int PageSize = 256;
 int PageTable[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 int FIFOQueue[4] = {-1, -1, -1, -1};
 int FIFOCount = 0;
-char Disk[2048] = {};
-char RAM[1024] = {};
-int PageFaultCount = 0;
-
-int GetPageNumber(int virtualAddress)
-{
-    return virtualAddress / PageSize;
-}
-
-int GetPageOffset(int address)
-{
-    return address % PageSize;
-}
-
-int GetFrameNumber(int physicalAddress)
-{
-    return physicalAddress / PageSize;
-}
-
-int GetPhysicalAddress(int frameNumber, int offset)
-{
-    return (frameNumber * PageSize) + offset;
-}
-
-int GetVirtualPage(int frameNumber)
-{
-    for (int i = 0; i < 8; i++)
-    {
-        if (PageTable[i] == frameNumber)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-int GetVirtualAddress(int pageNumber, int offset)
-{
-    return (pageNumber * PageSize) + offset;
-}
-
-
-int FindFreeFrame()
-{
-    for (int i = 0; i < 4; i++)
-    {
-        int aux = GetVirtualPage(i); 
-        if (aux < 0)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-void SavePageToDisk(int pageNumber, int frameNumber)
-{
-    int diskStart = pageNumber * PageSize;
-    int ramStart = frameNumber * PageSize;
-    for (int i = 0; i < PageSize; i++)
-    {
-        Disk[diskStart + i] = RAM[ramStart + i];
-    }
-}
-
-void LoadPageFromDisk(int pageNumber, int frameNumber)
-{
-    int diskStart =  pageNumber * PageSize;
-    int ramstart = frameNumber * PageSize;
-    for (int i = 0; i < PageSize; i++)
-    {
-        RAM [ramstart + i] = Disk[diskStart+ i];
-    }
-}
-
-
-void ReplacePage(int newPageNumber, int frameNumber)
-{
-    int currentPage = GetVirtualPage(frameNumber);
-    SavePageToDisk(currentPage, frameNumber);
-    PageTable[currentPage] = -1;
-    PageTable[newPageNumber] = frameNumber;
-    LoadPageFromDisk(newPageNumber, frameNumber);
-}
-
-void UpdateFIFO(int newPageNumber)
-{
-    if (FIFOCount < 4)
-    {
-        FIFOQueue[FIFOCount] = newPageNumber;
-        FIFOCount++;
-    }
-    else
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            FIFOQueue[i] = FIFOQueue[i + 1];
-        }
-        FIFOQueue[3] = newPageNumber;
-    }
-}
-
-
-void ReplaceOldestPage(int newPageNumber)
-{
-    int oldestPage = FIFOQueue[0];
-    int frameNumber = PageTable[oldestPage];
-    ReplacePage(newPageNumber, frameNumber);
-    UpdateFIFO(newPageNumber);
-}
-
-
-bool LoadPage(int pageNumber)
-{
-    int aux = FindFreeFrame();
-    if (aux == -1)
-    {
-        return false;
-    }
-    else
-    {
-        PageTable[pageNumber] = aux;
-        UpdateFIFO(pageNumber);
-        LoadPageFromDisk(pageNumber, aux);
-        return true; 
-    }
-}
-
-
-void InitializeDisk()
-{
-    for (int i = 0; i < VirtualMemorySize; i++)
-    {
-        Disk[i] = i;
-    }
-}
+segment_simulation segments[16];
 
 int main()
 {
