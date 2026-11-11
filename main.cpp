@@ -3,7 +3,7 @@
 #include "segmentation.h"
 #include "paging.h"
 
-
+// variaveis paging
 char Disk[2048] = {};
 char RAM[1024] = {};
 int PageFaultCount = 0;
@@ -13,7 +13,12 @@ int PageSize = 256;
 int PageTable[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 int FIFOQueue[4] = {-1, -1, -1, -1};
 int FIFOCount = 0;
-segment_simulation segments[8];
+
+//variaveis segmentos
+
+memory_position virtalRAM[512];
+memory_position disk[512];
+memory_position physicalRAM[256];
 
 int main()
 {
@@ -158,6 +163,5 @@ int main()
             }
         }
     }
-
     return 0;
 }

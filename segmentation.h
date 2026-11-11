@@ -1,12 +1,18 @@
 #ifndef SEGMENTATION_H
 #define SEGMENTATION_H
 struct segment_simulation {
-
-    bool valid_bit;
-    unsigned int attached_process;
-    unsigned int start;
-    unsigned int end;
+    unsigned int id;
+    unsigned int size;
 };
-extern segment_simulation segments[8];
+struct memory_position
+{
+    bool validBit;
+    bool dirtyBit;
+    unsigned int attached_process;
+};
 
+int allocSegment(segment_simulation segment, memory_position RAM);
+int deallocSegment(segment_simulation segment, memory_position RAM);
+void defragMemory(memory_position* memory);
+void routine();
 #endif
